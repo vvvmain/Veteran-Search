@@ -1,0 +1,638 @@
+<!-- public/index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Career Search for Veterans</title>
+    <style>
+        :root {
+            --primary: #0A1931;
+            --secondary: #1A2942;
+            --accent: #FFD700;
+            --text: #FFFFFF;
+            --card-bg: rgba(26, 41, 66, 0.7);
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background: var(--primary);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--accent);
+            margin-bottom: 40px;
+        }
+
+        /* Search Container Layout */
+        .search-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        /* Search Section Styles */
+        .search-section {
+            flex: 1;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .search-section h2 {
+            color: var(--accent);
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+
+        /* Form Styles */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        label {
+            color: var(--text);
+            font-size: 0.9rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid var(--accent);
+            border-radius: 25px;
+            color: var(--text);
+            margin-top: 5px;
+        }
+
+        /* Fix dropdown text color */
+        select option {
+            background: var(--secondary);
+            color: var(--text);
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+        }
+
+        button {
+            padding: 12px;
+            background: var(--accent);
+            color: var(--primary);
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        /* Results Section */
+        .results-container {
+            margin-top: 40px;
+        }
+
+        .results {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            position: relative;
+        }
+
+        /* Close button styles */
+        .close-results {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: var(--text);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .close-results:hover {
+            background: rgba(255, 0, 0, 0.2);
+            transform: rotate(90deg);
+        }
+
+        /* Loading animation */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .loading::after {
+            content: '';
+            width: 30px;
+            height: 30px;
+            border: 3px solid var(--accent);
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: loading 0.8s linear infinite;
+        }
+
+        @keyframes loading {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* No results message */
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: var(--text);
+            font-style: italic;
+        }
+
+        /* Clear all results button */
+        .clear-all-container {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .clear-all-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+            border: 1px solid var(--accent);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .clear-all-btn:hover {
+            background: rgba(255, 0, 0, 0.2);
+        }
+
+        .career {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+        }
+
+        .career h3 {
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+
+        .career p {
+            margin: 5px 0;
+            font-size: 0.9rem;
+        }
+
+        .career a {
+            color: var(--accent);
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .career a:hover {
+            text-decoration: underline;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .pagination button {
+            padding: 8px 15px;
+        }
+
+        @media (max-width: 992px) {
+            .search-container {
+                flex-direction: column;
+            }
+            
+            .search-section {
+                width: 100%;
+            }
+        }
+
+        .results-header {
+            color: var(--accent);
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            display: none;  /* Hidden by default */
+        }
+
+        .results:not(:empty) .results-header {
+            display: block;  /* Show when container has content */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Career Search for Veterans</h1>
+
+        <div class="search-container">
+            <!-- 1. Keyword Search -->
+            <section class="search-section">
+                <h2>Keyword Search</h2>
+                <form id="keyword-search-form">
+                    <label for="keyword">Keyword:</label>
+                    <input type="text" id="keyword" name="keyword" required placeholder="Enter keyword, e.g.: architect">
+                    <button type="submit">Search</button>
+                </form>
+            </section>
+
+            <!-- 2. Industry Search -->
+            <section class="search-section">
+                <h2>Industry Search</h2>
+                <form id="industry-search-form">
+                    <label for="industry">Industry:</label>
+                    <select id="industry" name="industry" required>
+                        <option value="">Select an Industry</option>
+                    </select>
+                    <button type="submit">Search Careers</button>
+                </form>
+            </section>
+
+            <!-- 3. Military Search -->
+            <section class="search-section">
+                <h2>Military Search</h2>
+                <form id="military-search-form">
+                    <label for="military-branch">Military Branch:</label>
+                    <select id="military-branch" name="military-branch" required>
+                        <option value="">Select a Branch</option>
+                        <option value="all">All</option>
+                        <option value="Army">Army</option>
+                        <option value="Navy">Navy</option>
+                        <option value="Air Force">Air Force</option>
+                        <option value="Marine Corps">Marine Corps</option>
+                        <option value="Coast Guard">Coast Guard</option>
+                    </select>
+                    <label for="moc">Military Occupational Code (MOC):</label>
+                    <input type="text" id="moc" name="moc" required placeholder="Enter MOC, e.g.: 11B">
+                    <button type="submit">Search</button>
+                </form>
+            </section>
+        </div>
+
+        <!-- Add Clear All Results button -->
+        <div class="clear-all-container">
+            <button onclick="clearAllResults()" class="clear-all-btn">Clear All Results</button>
+        </div>
+
+        <div class="results-container">
+            <div id="keyword-results" class="results">
+                <h3 class="results-header">Keyword Search Results</h3>
+            </div>
+            <div id="industry-results" class="results">
+                <h3 class="results-header">Industry Search Results</h3>
+            </div>
+            <div id="military-results" class="results">
+                <h3 class="results-header">Military Search Results</h3>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Update API endpoints to match server.js
+        const API_URL = '/api';
+
+        // Add timeout handling
+        async function fetchWithTimeout(resource, options = {}) {
+            const timeout = options.timeout || 8000; // 8 seconds timeout
+            const controller = new AbortController();
+            const id = setTimeout(() => controller.abort(), timeout);
+            
+            try {
+                const response = await fetch(resource, {
+                    ...options,
+                    signal: controller.signal
+                });
+                clearTimeout(id);
+                return response;
+            } catch (error) {
+                clearTimeout(id);
+                if (error.name === 'AbortError') {
+                    throw new Error('Request timed out');
+                }
+                throw error;
+            }
+        }
+
+        /**
+         * Load industry listing when page loads
+         */
+        document.addEventListener('DOMContentLoaded', async () => {
+            const industrySelect = document.getElementById('industry');
+            try {
+                const response = await fetchWithTimeout(`${API_URL}/industries`);
+                if (!response.ok) throw new Error('Failed to fetch industries');
+                const data = await response.json();
+
+                data.industry.forEach(ind => {
+                    const option = document.createElement('option');
+                    option.value = ind.code;
+                    option.textContent = ind.title;
+                    industrySelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error(error);
+                industrySelect.innerHTML = '<option value="">Error loading industries</option>';
+            }
+        });
+
+        /**
+         * 1. Keyword Search
+         */
+        document.getElementById('keyword-search-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const keyword = document.getElementById('keyword').value.trim();
+            const resultsDiv = document.getElementById('keyword-results');
+            resultsDiv.innerHTML = '<div class="loading"></div>';
+
+            try {
+                const response = await fetchWithTimeout(
+                    `${API_URL}/careers/search?keyword=${encodeURIComponent(keyword)}`
+                );
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Request failed');
+                }
+                const data = await response.json();
+                displayCareers(data.career, resultsDiv);
+            } catch (error) {
+                console.error(error);
+                resultsDiv.innerHTML = `
+                    <button class="close-results" onclick="clearResults(this)">×</button>
+                    <div class="no-results">Error: ${error.message}</div>
+                `;
+            }
+        });
+
+        /**
+         * 2. Industry Careers Search
+         */
+        document.getElementById('industry-search-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const industryCode = document.getElementById('industry').value;
+            const resultsDiv = document.getElementById('industry-results');
+            resultsDiv.innerHTML = '<div class="loading"></div>';
+
+            try {
+                const response = await fetchWithTimeout(
+                    `${API_URL}/industries/${encodeURIComponent(industryCode)}/careers`
+                );
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Request failed');
+                }
+                const data = await response.json();
+                displayCareers(data.career, resultsDiv);
+            } catch (error) {
+                console.error(error);
+                resultsDiv.innerHTML = `
+                    <button class="close-results" onclick="clearResults(this)">×</button>
+                    <div class="no-results">Error: ${error.message}</div>
+                `;
+            }
+        });
+
+        /**
+         * 3. Military Search
+         */
+        document.getElementById('military-search-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const branch = document.getElementById('military-branch').value;
+            const moc = document.getElementById('moc').value.trim();
+            const resultsDiv = document.getElementById('military-results');
+            resultsDiv.innerHTML = '<div class="loading"></div>';
+
+            try {
+                const response = await fetchWithTimeout(
+                    `${API_URL}/military/search?keyword=${encodeURIComponent(moc)}`
+                );
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Request failed');
+                }
+                const data = await response.json();
+
+                let filteredCareers = data.career;
+                if (branch !== 'all') {
+                    filteredCareers = data.career.filter(career => 
+                        career.military_jobs[branch.toLowerCase().replace(' ', '_')]
+                    );
+                }
+
+                displayCareers(filteredCareers, resultsDiv);
+            } catch (error) {
+                console.error(error);
+                resultsDiv.innerHTML = `
+                    <button class="close-results" onclick="clearResults(this)">×</button>
+                    <div class="no-results">Error: ${error.message}</div>
+                `;
+            }
+        });
+
+        /**
+         * Display careers in the DOM
+         */
+        function displayCareers(careers, container) {
+            if (!careers || careers.length === 0) {
+                container.innerHTML = `
+                    <h3 class="results-header">${getResultsTitle(container.id)}</h3>
+                    <button class="close-results" onclick="clearResults(this)">×</button>
+                    <div class="no-results">No careers found.</div>
+                `;
+                return;
+            }
+
+            const displayedCareers = careers.slice(0, 5);
+            
+            let html = `
+                <h3 class="results-header">${getResultsTitle(container.id)}</h3>
+                <button class="close-results" onclick="clearResults(this)">×</button>
+            `;
+            displayedCareers.forEach(career => {
+                html += `
+                    <div class="career">
+                        <h3>${career.title}</h3>
+                        <p><strong>O*NET Code:</strong> ${career.code}</p>
+                        ${career.percent_employed ? `<p><strong>Percent Employed:</strong> ${career.percent_employed}%</p>` : ''}
+                        ${career.preparation_needed ? `<p><strong>Preparation Needed:</strong> ${career.preparation_needed}</p>` : ''}
+                        ${career.pay_grade ? `<p><strong>Pay Grade:</strong> ${career.pay_grade}</p>` : ''}
+                        <p><strong>Tags:</strong> ${formatTags(career.tags)}</p>
+                        <p><strong>Military Branch Careers:</strong> ${formatMilitaryJobs(career.military_jobs)}</p>
+                        <a href="${career.href}" target="_blank">More Information</a>
+                    </div>
+                `;
+            });
+
+            if (careers.length > 5) {
+                html += `
+                    <div class="pagination">
+                        <button onclick="showAllResults(this)" data-all-results='${JSON.stringify(careers)}'>
+                            See More (${careers.length - 5} more results)
+                        </button>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        /**
+         * Format tags for display
+         */
+        function formatTags(tags) {
+            const formatted = [];
+            if (tags.bright_outlook) formatted.push('Bright Outlook');
+            if (tags.green) formatted.push('Green');
+            if (tags.apprenticeship) formatted.push('Registered Apprenticeship');
+            return formatted.join(', ') || 'None';
+        }
+
+        /**
+         * Format military jobs for display
+         */
+        function formatMilitaryJobs(militaryJobs) {
+            const branches = [];
+            for (const [key, value] of Object.entries(militaryJobs)) {
+                if (value) {
+                    const formattedKey = key.replace('_', ' ').replace(/\b\w/g, char => char.toUpperCase());
+                    branches.push(formattedKey);
+                }
+            }
+            return branches.join(', ') || 'None';
+        }
+
+        // Add this new function to handle showing all results
+        function showAllResults(button) {
+            const allResults = JSON.parse(button.dataset.allResults);
+            const container = button.closest('.results');
+            let html = `
+                <h3 class="results-header">${getResultsTitle(container.id)}</h3>
+                <button class="close-results" onclick="clearResults(this)">×</button>
+            `;
+            
+            allResults.forEach(career => {
+                html += `
+                    <div class="career">
+                        <h3>${career.title}</h3>
+                        <p><strong>O*NET Code:</strong> ${career.code}</p>
+                        ${career.percent_employed ? `<p><strong>Percent Employed:</strong> ${career.percent_employed}%</p>` : ''}
+                        ${career.preparation_needed ? `<p><strong>Preparation Needed:</strong> ${career.preparation_needed}</p>` : ''}
+                        ${career.pay_grade ? `<p><strong>Pay Grade:</strong> ${career.pay_grade}</p>` : ''}
+                        <p><strong>Tags:</strong> ${formatTags(career.tags)}</p>
+                        <p><strong>Military Branch Careers:</strong> ${formatMilitaryJobs(career.military_jobs)}</p>
+                        <a href="${career.href}" target="_blank">More Information</a>
+                    </div>
+                `;
+            });
+
+            // Add "Show Less" button
+            html += `
+                <div class="pagination">
+                    <button onclick="showLessResults(this, allResults)">Show Less</button>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        // Add this function to handle showing less results
+        function showLessResults(button, allResults) {
+            const container = button.closest('.results');
+            displayCareers(allResults, container);
+        }
+
+        // Add keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const activeResults = document.querySelector('.results:not(:empty)');
+                if (activeResults) {
+                    const closeButton = activeResults.querySelector('.close-results');
+                    if (closeButton) closeButton.click();
+                }
+            }
+        });
+
+        // Clear results functions
+        function clearResults(button) {
+            const container = button.closest('.results');
+            container.innerHTML = '';
+            
+            // Reset the corresponding form
+            if (container.id === 'keyword-results') {
+                document.getElementById('keyword-search-form').reset();
+            } else if (container.id === 'industry-results') {
+                document.getElementById('industry-search-form').reset();
+            } else if (container.id === 'military-results') {
+                document.getElementById('military-search-form').reset();
+            }
+        }
+
+        function clearAllResults() {
+            document.querySelectorAll('.results').forEach(container => {
+                container.innerHTML = '';
+            });
+            document.querySelectorAll('form').forEach(form => {
+                form.reset();
+            });
+        }
+
+        // Add this helper function to get the appropriate title
+        function getResultsTitle(containerId) {
+            switch(containerId) {
+                case 'keyword-results':
+                    return 'Keyword Search Results';
+                case 'industry-results':
+                    return 'Industry Search Results';
+                case 'military-results':
+                    return 'Military Search Results';
+                default:
+                    return 'Search Results';
+            }
+        }
+    </script>
+</body>
+</html>
